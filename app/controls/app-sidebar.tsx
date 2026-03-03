@@ -85,7 +85,7 @@ export function AppSidebar({ onNavigate, ...props }: Props) {
                             <img src="./assets/Retro.png" alt="header logo" className='PWA-Title-NonDraggable h-full w-full object-contain' />
                         </div>
                         <span className="truncate font-semibold">RSDK Library</span>
-                        <Button className='PWA-Title-NonDraggable w-9 h-9 ml-auto flex items-center justify-center' variant='ghost' onClick={() => window.open('https://github.com/Jdsle/RSDK', '_blank')}>
+                        <Button className='PWA-Title-NonDraggable w-9 h-9 ml-auto flex items-center justify-center' variant='ghost' onClick={() => window.open('https://github.com/RSDK-Library', '_blank')}>
                             <untitled.Codepen />
                         </Button>
                     </div>
