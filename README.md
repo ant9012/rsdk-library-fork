@@ -45,7 +45,7 @@ Each port has their own build instructions. You can learn how to build them by v
 * [RSDKv2-Decompilation](https://github.com/Jdsle/RSDKv2-Decompilation/tree/web)
 * [RSDKv3-Decompilation](https://github.com/ant9012/RSDKv3-Decompilation)
 * [RSDKv4-Decompilation](https://github.com/Jdsle/RSDKv4-Decompilation/tree/web)
-* [RSDKv5-Decompilation](https://github.com/ant9012/RSDKv3-Decompilation)
+* [RSDKv5-Decompilation](https://github.com/ant9012/RSDKv5-Decompilation)
 
 While not an engine - thought I'd include this here anyways
 * [RSDK-Library-FilesModule](https://github.com/Jdsle/RSDK-Library-FilesModule)
