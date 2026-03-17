@@ -10,7 +10,6 @@ import '@/app/engine.css'
 // --------------------
 
 import Head from 'next/head'
-import Script from 'next/script'
 
 import { ThemeProvider } from '@/app/controls/theme-provider'
 import { Splash } from '@/app/controls/splash'
@@ -26,15 +25,46 @@ import EngineFS from '@/lib/EngineFS'
 // ---------------------
 
 export default function V5U() {
-    // this is stupid.
     React.useEffect(() => {
-        window.TS_InitFS = async (p: string, f: any) => {
+        // Expose the init function to the global window
+        (window as any).TS_InitFS = async (p: string, f: any) => {
             try {
                 await EngineFS.Init(p);
                 f();
             } catch (error) {
+                console.error("FS Init Error:", error);
             }
         };
+
+        // Helper function to load scripts in strict sequential order
+        const loadScript = (src: string) => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = false; 
+                script.onload = resolve;
+                script.onerror = reject;
+                document.body.appendChild(script);
+            });
+        };
+
+        // Boot sequence
+        const bootEngine = async () => {
+            try {
+               
+                await loadScript('coi-serviceworker.js');
+                
+               
+                await loadScript('./modules/RSDKv5U.js');
+                
+                
+                await loadScript('./lib/RSDKv5U.js');
+            } catch (err) {
+                console.error("Failed to load engine scripts:", err);
+            }
+        };
+
+        bootEngine();
     }, []);
 
     return (
@@ -47,9 +77,8 @@ export default function V5U() {
                     <Splash/>
                     <canvas className='engineCanvas' id='canvas' />
                 </ThemeProvider>
-                <Script src='coi-serviceworker.js' />
-                <Script src='./lib/RSDKv5U.js' strategy="afterInteractive"/>
-                <Script src='./modules/RSDKv5U.js' strategy="beforeInteractive"/>
+                
+
             </div>
         </>
     )
