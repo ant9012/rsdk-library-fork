@@ -48,8 +48,8 @@ export default function V5U() {
                     <canvas className='engineCanvas' id='canvas' />
                 </ThemeProvider>
                 <Script src='coi-serviceworker.js' />
-                <Script src='./lib/RSDKv5U.js' />
-                <Script src='./modules/RSDKv5U.js' />
+                <Script src='./lib/RSDKv5U.js' strategy="afterInteractive"/>
+                <Script src='./modules/RSDKv5U.js' strategy="beforeInteractive"/>
             </div>
         </>
     )
