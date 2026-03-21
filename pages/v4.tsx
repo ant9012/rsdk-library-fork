@@ -147,6 +147,8 @@ export default function V4() {
                 </ThemeProvider>
 
                 <Script src='coi-serviceworker.js' strategy="beforeInteractive" />
+
+                
                 <Script src='./lib/RSDKv4.js' strategy="lazyOnload" />
                 <Script src='./modules/RSDKv4.js' strategy="lazyOnload" />
             </div>
