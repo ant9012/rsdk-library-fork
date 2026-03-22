@@ -52,6 +52,41 @@ export default function V4() {
         };
     }, [isReady]);
 
+        // Unlock Web Audio on first user interaction
+    useEffect(() => {
+        const unlockAudio = () => {
+            // Emscripten exposes the AudioContext via the Module object
+            // @ts-ignore
+            if (window.Module && window.Module.SDL2 && window.Module.SDL2.audioContext) {
+                // @ts-ignore
+                const audioCtx = window.Module.SDL2.audioContext;
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume().then(() => {
+                        console.log("AudioContext resumed successfully.");
+                    });
+                }
+            } else {
+                // Fallback standard web audio unlock
+                // @ts-ignore
+                if (window.SDL && window.SDL.audioContext && window.SDL.audioContext.state === 'suspended') {
+                     // @ts-ignore
+                     window.SDL.audioContext.resume();
+                }
+            }
+        };
+
+        // Listen for any interaction
+        window.addEventListener('click', unlockAudio, { once: true });
+        window.addEventListener('keydown', unlockAudio, { once: true });
+        window.addEventListener('touchstart', unlockAudio, { once: true });
+
+        return () => {
+            window.removeEventListener('click', unlockAudio);
+            window.removeEventListener('keydown', unlockAudio);
+            window.removeEventListener('touchstart', unlockAudio);
+        };
+    }, []);
+
     return (
         <>
             <Head>
