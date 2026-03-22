@@ -16,7 +16,7 @@ export default function V4() {
     const [isReady, setIsReady] = useState(false);
     const consoleRef = useRef<HTMLTextAreaElement>(null);
 
-    // 1. Console Hook (For debugging on mobile/deployment)
+    // 1. Console Hook
     useEffect(() => {
         const originalLog = console.log;
         const originalError = console.error;
@@ -30,30 +30,45 @@ export default function V4() {
         console.error = (...args) => { originalError.apply(console, args); logToScreen("ERR", args.join(' ')); };
     }, []);
 
-    // 2. THE GATEKEEPER
+    // 2. Security Gate
     useEffect(() => {
-        // If we are already secure (Pthreads allowed), let the game load.
         if (window.crossOriginIsolated) {
-            console.log("Environment Secure. Starting Engine...");
+            console.log("Environment Secure (COOP/COEP Active).");
             setIsReady(true);
         } else {
-            console.log("Environment Insecure. Waiting for Service Worker Reload...");
+            console.log("Environment Insecure. Registering Service Worker...");
         }
     }, []);
 
-    // 3. FileSystem Hook (Only runs if Secure)
+    // 3. FileSystem Hook (WITH TIMEOUT FIX)
     useEffect(() => {
         if (!isReady) return;
         
         // @ts-ignore
         window.TS_InitFS = async (p: string, f: any) => {
             console.log("Initializing FileSystem...");
+
+            // Create a 3-second timeout to detect deadlocks
+            const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve('timeout'), 3000));
+            
             try {
-                await EngineFS.Init(p);
-                console.log("FileSystem Ready.");
-                f();
+                // Race the FS Init against the timeout
+                const result = await Promise.race([
+                    EngineFS.Init(p).then(() => 'success'),
+                    timeoutPromise
+                ]);
+
+                if (result === 'timeout') {
+                    console.error("FS Init Timed Out (Pthread Deadlock detected). Skipping FS...");
+                    // Force the game to start without FS
+                    f(); 
+                } else {
+                    console.log("FileSystem Ready.");
+                    f(); // Start game normally
+                }
             } catch (error) {
                 console.error("FS Error:", error);
+                f(); // Try to start anyway
             }
         };
     }, [isReady]);
@@ -66,27 +81,23 @@ export default function V4() {
             <div className='enginePage' style={{position: 'relative', width: '100vw', height: '100vh', backgroundColor: 'black'}}>
                 <ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
                     
-                    {/* ALWAYS Load Service Worker First */}
                     <Script src='coi-serviceworker.js' strategy="beforeInteractive" />
 
-                    {/* ONLY Load Game if Secure */}
                     {isReady ? (
                         <>
                             <canvas id='canvas' className='engineCanvas' style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'block'}} onContextMenu={(e)=>e.preventDefault()} />
                             <div style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none'}}><Splash/></div>
                             
-                            {/* Load Wrapper, then Engine */}
+                            {/* Make sure paths match where you put files in public/ */}
                             <Script src='./lib/RSDKv4.js' strategy="lazyOnload" />
                             <Script src='./modules/RSDKv4.js' strategy="lazyOnload" />
                         </>
                     ) : (
                         <div style={{color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
                             <h2>Enabling High Performance Mode...</h2>
-                            <p>Reloading page to enable Pthreads</p>
                         </div>
                     )}
 
-                    {/* Debug Console */}
                     <textarea ref={consoleRef} style={{position: 'absolute', bottom: 0, left: 0, width: '100%', height: '100px', background: 'rgba(0,0,0,0.8)', color: 'lime', border: 'none', zIndex: 9999}} readOnly />
 
                 </ThemeProvider>
