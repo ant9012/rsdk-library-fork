@@ -1,20 +1,27 @@
 // --------------------
 // UI Component Imports
 // --------------------
+
 import { toast } from "sonner"
 
 // ---------------
 // Library Imports
 // ---------------
+
 import { PathLike } from 'fs';
 import JSZip from 'jszip';
 
 // ------------------
 // Global Definitions
 // ------------------
+
 declare const FS: any;
 declare const PATH: any;
 declare const IDBFS: any;
+
+// ---------------------
+// Component Definitions
+// ---------------------
 
 export type FileItem = {
     id?: number;
@@ -25,28 +32,34 @@ export type FileItem = {
 };
 
 class EngineFS {
+
+    // --------------------
+    // Variable Definitions
+    // --------------------
+
     public static fspath: string = "//FileSystem"
     private static activeMount: string | null = null
+
     public static actionInProgress: boolean = false
     public static actionProgress: number = 0
     public static actionStatus: string = ""
+
     private static clipboard: { items: FileItem[], isCut: boolean } | null = null
+
+    // --------------------
+    // Function Definitions
+    // --------------------
 
     public static async Init(id: string) {
         return new Promise<void>(async (resolve, reject) => {
             if (EngineFS.activeMount) {
                 await EngineFS.Unmount(EngineFS.activeMount)
             }
-            // Ensure root exists
-            if (!FS.analyzePath(`/${id}`).exists) FS.mkdir(id)
-            
-            // Mount IDBFS (Database)
+            if (!FS.analyzePath(`/${id}`).exists)
+                FS.mkdir(id)
             FS.mount(IDBFS, { root: `/${id}` }, id)
             EngineFS.activeMount = id
-            
-            // Attempt Sync with Timeout protection
             await EngineFS.SyncInit()
-            
             EngineFS.fspath = `/${id}`
             resolve()
         })
@@ -54,79 +67,31 @@ class EngineFS {
 
     private static async Unmount(id: string) {
         return new Promise<void>((resolve) => {
-            try {
-                FS.unmount(id)
-            } catch(e) { console.error(e); }
+            FS.unmount(id)
             EngineFS.activeMount = null
             resolve()
         })
     }
 
-    // --- FIX: Add Timeout to detect Pthread Deadlock ---
     private static async SyncInit() {
         return new Promise<void>((resolve, reject) => {
-            let completed = false;
-
-            // 1. Set a safety timeout (1.5 seconds)
-            const timeout = setTimeout(() => {
-                if (!completed) {
-                    completed = true;
-                    console.warn("EngineFS: IDBFS Sync Timed Out (Pthread Deadlock). Switching to Memory-Only Mode.");
-                    toast("Warning: Save data disabled (Pthread Mode).");
-                    resolve(); // Proceed anyway!
+            FS.syncfs(true, function (error: any) {
+                if (error) {
+                    EngineFS.AlertError(`EngineFS.SyncInit Error: ${error}`)
+                    reject(error)
+                } else {
+                    resolve()
                 }
-            }, 1500);
-
-            // 2. Attempt the Sync
-            try {
-                FS.syncfs(true, function (error: any) {
-                    if (completed) return; // Timed out already
-                    completed = true;
-                    clearTimeout(timeout);
-                    
-                    if (error) {
-                        console.error(`EngineFS.SyncInit Error: ${error}`);
-                        // Don't reject, just let the game start without data
-                        resolve(); 
-                    } else {
-                        console.log("EngineFS: IDBFS Synced Successfully.");
-                        resolve();
-                    }
-                })
-            } catch (e) {
-                if (!completed) {
-                    completed = true;
-                    console.error("EngineFS Sync Crash:", e);
-                    resolve();
-                }
-            }
+            })
         })
     }
 
     public static async Save() {
         return new Promise<void>((resolve, reject) => {
-            // Check if we are in a deadlock state from Init
-            // If Init failed/timed out, saving will likely freeze too.
-            // For now, we attempt it but with a short timeout.
-            
-            let completed = false;
-            const timeout = setTimeout(() => {
-                if (!completed) {
-                    completed = true;
-                    console.warn("EngineFS: Save Timed Out.");
-                    resolve();
-                }
-            }, 500);
-
-            FS.syncfs(false, function (error: any) {
-                if(completed) return;
-                completed = true;
-                clearTimeout(timeout);
-                
+            FS.syncfs(function (error: any) {
                 if (error) {
-                    console.error(`EngineFS.Save Error: ${error}`);
-                    // reject(error); // Don't crash app on save fail
-                    resolve();
+                    EngineFS.AlertError(`EngineFS.Save Error: ${error}`);
+                    reject(error);
                 } else {
                     console.log('Synchronized FS');
                     resolve();
@@ -136,14 +101,10 @@ class EngineFS {
     }
 
     public static AlertError(msg: string) {
-        // alert(msg); // Disable alerts to prevent UI blocking
+        alert(msg);
         console.error(msg);
-        toast(msg);
     }
 
-    // ... (Keep the rest of your FileUpload/Download/Zip functions exactly the same) ...
-    // Copy/Paste the rest of your original file below here:
-    
     public static async FileUpload(useDir: boolean) {
         return EngineFS.FileUploadDlg(useDir, (files) => EngineFS.FileUploadCommon(files, true));
     }
@@ -175,7 +136,6 @@ class EngineFS {
             _input.click();
         });
     }
-    
     public static async FileUploadCommon(files: FileList | File[], shouldSave: boolean, parent: string = EngineFS.fspath) {
         EngineFS.actionInProgress = true;
         EngineFS.actionProgress = 0;
