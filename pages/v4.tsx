@@ -95,7 +95,7 @@ export default function V4() {
             <div className='enginePage' style={{position: 'relative', width: '100vw', height: '100vh', backgroundColor: 'black'}}>
                 <ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
                     
-                    <Script src='coi-serviceworker.js' strategy="beforeInteractive" />
+                    <Script src='./coi-serviceworker.js' strategy="beforeInteractive" />
 
                     {isReady ? (
                         <>
