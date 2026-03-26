@@ -1,39 +1,13 @@
 var Module = {
     onRuntimeInitialized: function () {
-        TS_InitFS('RSDKv4', function () {
-    console.log('EngineFS initialized');
-    
-    // 1. Tell the UI we are downloading
-    Module.setStatus('Downloading Game Data...');
-    
-    // 2. Fetch Data.rsdk manually from your server
-    fetch('Data.rsdk')
-        .then(response => {
-            if (!response.ok) throw new Error("Could not find Data.rsdk on the server!");
-            return response.arrayBuffer();
-        })
-        .then(buffer => {
-            // 3. Write the downloaded file into Emscripten's Virtual Filesystem
-            // We write it into the /RSDKv4 folder since your RSDK_Init() does FS.chdir('/RSDKv4')
-            FS.writeFile('/RSDKv4/Data.rsdk', new Uint8Array(buffer));
-            console.log('Data.rsdk mounted successfully!');
-            
-            // 4. Clean up the UI
-            Module.setStatus(''); 
-            const splash = document.getElementById("splash");
-            if (splash) {
+        TS_InitFS('RSDKv4',
+            function () {
+                console.log('EngineFS initialized');
+                const splash = document.getElementById("splash");
                 splash.style.opacity = 0;
                 setTimeout(() => { splash.remove(); }, 1000);
-            }
-            
-            // 5. NOW we boot the engine!
-            RSDK_Init();
-        })
-        .catch(err => {
-            console.error(err);
-            Module.setStatus('Failed to load game assets.');
-        });
-});
+                RSDK_Init();
+            });
     },
     print: (function () {
         var element = document.getElementById('output');
