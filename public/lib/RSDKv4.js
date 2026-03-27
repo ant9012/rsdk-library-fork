@@ -88,3 +88,23 @@ function RSDK_Init() {
 
     _RSDK_Initialize();
 }
+
+// Add this to the bottom of your script
+window.addEventListener('mousedown', function() {
+    // 1. Resume the Web Audio Context (JS Side)
+    if (typeof SDL2 !== 'undefined' && SDL2.audioContext) {
+        if (SDL2.audioContext.state === 'suspended') {
+            SDL2.audioContext.resume().then(() => {
+                console.log("Web AudioContext Resumed");
+            });
+        }
+    }
+
+    // 2. Call the C++ Wake Function (Engine Side)
+    // This tells SDL to unpause the audio device
+    try {
+        Module.ccall('Mono_WakeAudio', null, [], []);
+    } catch (e) {
+        // Function might not be exported yet or failed
+    }
+}, { once: false }); // Set to false so it catches clicks if focus is lost/regained
