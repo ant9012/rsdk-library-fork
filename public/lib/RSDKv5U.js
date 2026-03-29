@@ -27,15 +27,32 @@ document.body.style.overflow = 'hidden';
 
 window.addEventListener('resize', enforceIntegerScaling);
 var Module = {
-    onRuntimeInitialized: function () {
-        TS_InitFS('RSDKv5U',
-            function () {
-                console.log('EngineFS initialized');
-                const splash = document.getElementById("splash");
+    preRun: [function() {
+        // 1. Add a block to prevent the C++ engine from initializing yet
+        Module.addRunDependency('syncfs');
+        
+        // 2. Start the async VFS / IndexedDB loading
+        TS_InitFS('RSDKv5U', function () {
+            console.log('EngineFS initialized');
+            
+            const splash = document.getElementById("splash");
+            if (splash) {
                 splash.style.opacity = 0;
                 setTimeout(() => { splash.remove(); }, 1000);
-                RSDK_Init();
-            });
+            }
+            
+            // 3. Set the Emscripten Working Directory to your upload folder
+            FS.chdir('/RSDKv5U');
+            
+            // 4. File system is ready! Remove the block.
+            // This will tell Emscripten it is now safe to proceed to onRuntimeInitialized.
+            Module.removeRunDependency('syncfs');
+        });
+    }],
+    onRuntimeInitialized: function () {
+        // Because we used run dependencies in preRun, this function is guaranteed 
+        // to only execute AFTER the IndexedDB files are fully loaded into the VFS.
+        RSDK_Init();
     },
     print: (function () {
         var element = document.getElementById('output');
@@ -70,8 +87,6 @@ var Module = {
         }
 
         console.log(text);
-
-        // statusElement.innerHTML = text;
     },
     totalDependencies: 0,
     monitorRunDependencies: (left) => {
@@ -79,6 +94,7 @@ var Module = {
         Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
     }
 };
+
 Module.setStatus('Downloading...');
 window.onerror = () => {
     Module.setStatus('Exception thrown, see JavaScript console');
@@ -89,6 +105,8 @@ window.onerror = () => {
 };
 
 function RSDK_Init() {
+    // Redundant but safe: Ensure we are in the correct directory 
+    // before the C++ engine starts calling fopen()
     FS.chdir('/RSDKv5U');
 
     const storedSettings = localStorage.getItem('settings');
