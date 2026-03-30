@@ -82,8 +82,13 @@ export default function V5U() {
             try {
                 await EngineFS.Init(p);
                 f();
-            } catch (error) {
-                console.error("FS Init Error:", error);
+            } catch (error: any) {
+                // Check if this is just Emscripten's expected infinite loop halt
+                if (error === 'unwind' || String(error).includes('unwind') || (error && error.name === 'ExitStatus')) {
+                    console.log("Engine successfully yielded to the browser event loop.");
+                } else {
+                    console.error("FS Init Error:", error);
+                }
             }
         };
     }, []);
