@@ -28,6 +28,7 @@ document.body.style.overflow = 'hidden';
 window.addEventListener('resize', enforceIntegerScaling);
 
 var Module = {
+    noInitialRun: true,
     // We are back to your original, safe initialization phase
     onRuntimeInitialized: function () {
         TS_InitFS('RSDKv5U',
