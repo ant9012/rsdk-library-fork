@@ -108,15 +108,5 @@ function RSDK_Init() {
     // 3. Initialize the Engine API
     _RSDK_Initialize();
 
-    try {
-        Module.callMain();
-    } catch (e) {
-        // Check if this is just Emscripten's expected infinite loop halt
-        if (e === 'unwind' || String(e).includes('unwind') || (e.name && e.name === 'ExitStatus')) {
-            console.log("Engine yielded to browser event loop successfully.");
-        } else {
-            // If it's a real crash, rethrow it so window.onerror can catch it
-            throw e; 
-        }
-    }
+    Module.callMain();
 }
