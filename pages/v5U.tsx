@@ -92,19 +92,19 @@ export default function V5U() {
                     <Splash/>
                     <canvas className='engineCanvas' id='canvas' />
 
-                    {/* --- Console Overlay (Always Visible) --- */}
+                    {/* --- Console Overlay (Always Visible, Bulletproof Z-Index) --- */}
                     <div 
                         className="engine-console"
                         style={{
-                            position: 'absolute',
+                            position: 'fixed', // Locks to the viewport
                             top: 0,
                             left: 0,
-                            width: '100%',
-                            height: '40%',
+                            width: '100vw', // Full viewport width
+                            height: '40vh', // 40% viewport height
                             backgroundColor: 'rgba(0, 0, 0, 0.85)',
                             color: '#00ff00',
                             fontFamily: 'monospace',
-                            zIndex: 9999, // Ensure it sits above the canvas/splash
+                            zIndex: 2147483647, // Maximum possible z-index value
                             display: 'flex',
                             flexDirection: 'column',
                             padding: '1rem',
