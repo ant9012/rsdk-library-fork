@@ -24800,10 +24800,10 @@ function checkIncomingModuleAPI() {
 }
 
 var ASM_CONSTS = {
-  1316324: () => {
+  1313908: () => {
     window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
   },
-  1316425: () => {
+  1314009: () => {
     FS.syncfs(false, function(err) {
       if (err) {
         ccall("SyncFSCompleted", null, [ "number" ], [ err ]);
@@ -24812,7 +24812,7 @@ var ASM_CONSTS = {
       }
     });
   },
-  1316584: ($0, $1, $2, $3, $4) => {
+  1314168: ($0, $1, $2, $3, $4) => {
     if (typeof window === "undefined" || (window.AudioContext || window.webkitAudioContext) === undefined) {
       return 0;
     }
@@ -24879,7 +24879,7 @@ var ASM_CONSTS = {
     window.miniaudio.referenceCount += 1;
     return 1;
   },
-  1318574: () => {
+  1316158: () => {
     if (typeof (window.miniaudio) !== "undefined") {
       window.miniaudio.referenceCount -= 1;
       if (window.miniaudio.referenceCount === 0) {
@@ -24887,8 +24887,8 @@ var ASM_CONSTS = {
       }
     }
   },
-  1318738: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
-  1318842: () => {
+  1316322: () => (navigator.mediaDevices !== undefined && navigator.mediaDevices.getUserMedia !== undefined),
+  1316426: () => {
     try {
       var temp = new (window.AudioContext || window.webkitAudioContext);
       var sampleRate = temp.sampleRate;
@@ -24898,7 +24898,7 @@ var ASM_CONSTS = {
       return 0;
     }
   },
-  1319013: ($0, $1, $2, $3, $4, $5) => {
+  1316597: ($0, $1, $2, $3, $4, $5) => {
     var deviceType = $0;
     var channels = $1;
     var sampleRate = $2;
@@ -24968,8 +24968,8 @@ var ASM_CONSTS = {
     }
     return miniaudio.track_device(device);
   },
-  1321796: $0 => miniaudio.get_device_by_index($0).webaudio.sampleRate,
-  1321862: $0 => {
+  1319380: $0 => miniaudio.get_device_by_index($0).webaudio.sampleRate,
+  1319446: $0 => {
     var device = miniaudio.get_device_by_index($0);
     if (device.scriptNode !== undefined) {
       device.scriptNode.onaudioprocess = function(e) {};
@@ -24983,20 +24983,20 @@ var ASM_CONSTS = {
     device.webaudio.close();
     device.webaudio = undefined;
   },
-  1322227: $0 => {
+  1319811: $0 => {
     miniaudio.untrack_device_by_index($0);
   },
-  1322270: $0 => {
+  1319854: $0 => {
     var device = miniaudio.get_device_by_index($0);
     device.webaudio.resume();
     device.state = miniaudio.device_state.started;
   },
-  1322395: $0 => {
+  1319979: $0 => {
     var device = miniaudio.get_device_by_index($0);
     device.webaudio.suspend();
     device.state = miniaudio.device_state.stopped;
   },
-  1322521: $0 => {
+  1320105: $0 => {
     var str = UTF8ToString($0) + "\n\n" + "Abort/Retry/Ignore/AlwaysIgnore? [ariA] :";
     var reply = window.prompt(str, "i");
     if (reply === null) {
@@ -25004,7 +25004,7 @@ var ASM_CONSTS = {
     }
     return reply.length === 1 ? reply.charCodeAt(0) : -1;
   },
-  1322736: () => {
+  1320320: () => {
     if (typeof (AudioContext) !== "undefined") {
       return true;
     } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -25012,7 +25012,7 @@ var ASM_CONSTS = {
     }
     return false;
   },
-  1322883: () => {
+  1320467: () => {
     if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
       return true;
     } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -25020,7 +25020,7 @@ var ASM_CONSTS = {
     }
     return false;
   },
-  1323117: $0 => {
+  1320701: $0 => {
     if (typeof (Module["SDL2"]) === "undefined") {
       Module["SDL2"] = {};
     }
@@ -25044,11 +25044,11 @@ var ASM_CONSTS = {
     }
     return SDL2.audioContext === undefined ? -1 : 0;
   },
-  1323669: () => {
+  1321253: () => {
     var SDL2 = Module["SDL2"];
     return SDL2.audioContext.sampleRate;
   },
-  1323737: ($0, $1, $2, $3) => {
+  1321321: ($0, $1, $2, $3) => {
     var SDL2 = Module["SDL2"];
     var have_microphone = function(stream) {
       if (SDL2.capture.silenceTimer !== undefined) {
@@ -25090,7 +25090,7 @@ var ASM_CONSTS = {
       }, have_microphone, no_microphone);
     }
   },
-  1325430: ($0, $1, $2, $3) => {
+  1323014: ($0, $1, $2, $3) => {
     var SDL2 = Module["SDL2"];
     SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
     SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -25122,7 +25122,7 @@ var ASM_CONSTS = {
       SDL2.audio.silenceTimer = setInterval(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1e3);
     }
   },
-  1326605: ($0, $1) => {
+  1324189: ($0, $1) => {
     var SDL2 = Module["SDL2"];
     var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
     for (var c = 0; c < numChannels; ++c) {
@@ -25141,7 +25141,7 @@ var ASM_CONSTS = {
       }
     }
   },
-  1327210: ($0, $1) => {
+  1324794: ($0, $1) => {
     var SDL2 = Module["SDL2"];
     var buf = $0 >>> 2;
     var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
@@ -25155,7 +25155,7 @@ var ASM_CONSTS = {
       }
     }
   },
-  1327699: $0 => {
+  1325283: $0 => {
     var SDL2 = Module["SDL2"];
     if ($0) {
       if (SDL2.capture.silenceTimer !== undefined) {
@@ -25189,10 +25189,10 @@ var ASM_CONSTS = {
       SDL2.audioContext = undefined;
     }
   },
-  1328705: $0 => {
+  1326289: $0 => {
     window.open(UTF8ToString($0), "_blank");
   },
-  1328745: ($0, $1, $2) => {
+  1326329: ($0, $1, $2) => {
     var w = $0;
     var h = $1;
     var pixels = $2;
@@ -25263,7 +25263,7 @@ var ASM_CONSTS = {
     }
     SDL2.ctx.putImageData(SDL2.image, 0, 0);
   },
-  1330211: ($0, $1, $2, $3, $4) => {
+  1327795: ($0, $1, $2, $3, $4) => {
     var w = $0;
     var h = $1;
     var hot_x = $2;
@@ -25300,19 +25300,19 @@ var ASM_CONSTS = {
     stringToUTF8(url, urlBuf, url.length + 1);
     return urlBuf;
   },
-  1331199: $0 => {
+  1328783: $0 => {
     if (Module["canvas"]) {
       Module["canvas"].style["cursor"] = UTF8ToString($0);
     }
   },
-  1331282: () => {
+  1328866: () => {
     if (Module["canvas"]) {
       Module["canvas"].style["cursor"] = "none";
     }
   },
-  1331351: () => window.innerWidth,
-  1331381: () => window.innerHeight,
-  1331412: ($0, $1) => {
+  1328935: () => window.innerWidth,
+  1328965: () => window.innerHeight,
+  1328996: ($0, $1) => {
     alert(UTF8ToString($0) + "\n\n" + UTF8ToString($1));
   }
 };
@@ -25332,6 +25332,8 @@ var _malloc = makeInvalidEarlyAccess("_malloc");
 
 var _free = makeInvalidEarlyAccess("_free");
 
+var _calloc = makeInvalidEarlyAccess("_calloc");
+
 var _ma_malloc_emscripten = Module["_ma_malloc_emscripten"] = makeInvalidEarlyAccess("_ma_malloc_emscripten");
 
 var _ma_free_emscripten = Module["_ma_free_emscripten"] = makeInvalidEarlyAccess("_ma_free_emscripten");
@@ -25343,8 +25345,6 @@ var _ma_device_process_pcm_frames_playback__webaudio = Module["_ma_device_proces
 var _realloc = makeInvalidEarlyAccess("_realloc");
 
 var _fileno = makeInvalidEarlyAccess("_fileno");
-
-var _calloc = makeInvalidEarlyAccess("_calloc");
 
 var _fflush = makeInvalidEarlyAccess("_fflush");
 
@@ -25446,13 +25446,13 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports["SyncFSCompleted"] != "undefined", "missing Wasm export: SyncFSCompleted");
   assert(typeof wasmExports["malloc"] != "undefined", "missing Wasm export: malloc");
   assert(typeof wasmExports["free"] != "undefined", "missing Wasm export: free");
+  assert(typeof wasmExports["calloc"] != "undefined", "missing Wasm export: calloc");
   assert(typeof wasmExports["ma_malloc_emscripten"] != "undefined", "missing Wasm export: ma_malloc_emscripten");
   assert(typeof wasmExports["ma_free_emscripten"] != "undefined", "missing Wasm export: ma_free_emscripten");
   assert(typeof wasmExports["ma_device_process_pcm_frames_capture__webaudio"] != "undefined", "missing Wasm export: ma_device_process_pcm_frames_capture__webaudio");
   assert(typeof wasmExports["ma_device_process_pcm_frames_playback__webaudio"] != "undefined", "missing Wasm export: ma_device_process_pcm_frames_playback__webaudio");
   assert(typeof wasmExports["realloc"] != "undefined", "missing Wasm export: realloc");
   assert(typeof wasmExports["fileno"] != "undefined", "missing Wasm export: fileno");
-  assert(typeof wasmExports["calloc"] != "undefined", "missing Wasm export: calloc");
   assert(typeof wasmExports["fflush"] != "undefined", "missing Wasm export: fflush");
   assert(typeof wasmExports["strerror"] != "undefined", "missing Wasm export: strerror");
   assert(typeof wasmExports["pthread_self"] != "undefined", "missing Wasm export: pthread_self");
@@ -25505,13 +25505,13 @@ function assignWasmExports(wasmExports) {
   _SyncFSCompleted = Module["_SyncFSCompleted"] = createExportWrapper("SyncFSCompleted", 2);
   _malloc = createExportWrapper("malloc", 1);
   _free = createExportWrapper("free", 1);
+  _calloc = createExportWrapper("calloc", 2);
   _ma_malloc_emscripten = Module["_ma_malloc_emscripten"] = createExportWrapper("ma_malloc_emscripten", 2);
   _ma_free_emscripten = Module["_ma_free_emscripten"] = createExportWrapper("ma_free_emscripten", 2);
   _ma_device_process_pcm_frames_capture__webaudio = Module["_ma_device_process_pcm_frames_capture__webaudio"] = createExportWrapper("ma_device_process_pcm_frames_capture__webaudio", 3);
   _ma_device_process_pcm_frames_playback__webaudio = Module["_ma_device_process_pcm_frames_playback__webaudio"] = createExportWrapper("ma_device_process_pcm_frames_playback__webaudio", 3);
   _realloc = createExportWrapper("realloc", 2);
   _fileno = createExportWrapper("fileno", 1);
-  _calloc = createExportWrapper("calloc", 2);
   _fflush = createExportWrapper("fflush", 1);
   _strerror = createExportWrapper("strerror", 1);
   _pthread_self = createExportWrapper("pthread_self", 0);
