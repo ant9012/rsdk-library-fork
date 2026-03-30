@@ -96,9 +96,6 @@ window.onerror = () => {
 
 function RSDK_Init() {
     try {
-        // 1. Force Emscripten to lock onto the live Next.js canvas
-        Module.canvas = document.getElementById('canvas');
-        
         FS.chdir('/RSDKv5U');
 
         const storedSettings = localStorage.getItem('settings');
@@ -109,19 +106,12 @@ function RSDK_Init() {
             }
         }
 
-        // 2. Boot the C-runtime and WebGL subsystems properly
-        // If your fork uses a standard main(), this will start the game and throw 'unwind'.
+        // Boot the runtime
         Module.callMain(); 
 
-        // 3. Fallback: If callMain didn't start the engine loop, trigger it manually
-        if (typeof _RSDK_Initialize !== 'undefined') {
-            _RSDK_Initialize();
-        }
-
     } catch (e) {
-        // Silently catch the expected unwind exception
         if (e === 'unwind' || String(e).includes('unwind') || (e && e.name === 'ExitStatus')) {
-            console.log("Main loop established. Engine is officially running.");
+            console.log("Main loop successfully attached to React canvas.");
         } else {
             console.error("Critical Engine Error:", e);
             throw e; 
