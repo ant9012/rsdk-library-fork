@@ -45,17 +45,21 @@ export default function V5U() {
 
         // Toggle console with the Backtick (`) key
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === '`') {
+            // e.code === 'Backquote' targets the physical key, ignoring Shift/layout weirdness
+            if (e.code === 'Backquote' || e.key === '`' || e.key === '~') {
                 e.preventDefault();
+                e.stopPropagation(); // Stop the engine from seeing this keypress
+                
                 setShowConsole((prev) => !prev);
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
+        // { capture: true } forces this listener to fire BEFORE the canvas intercepts it
+        window.addEventListener('keydown', handleKeyDown, { capture: true });
 
         return () => {
             console.log = originalLog;
-            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keydown', handleKeyDown, { capture: true });
         };
     }, []);
 
