@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --font-sans: 'GeistSans',
-    --font-mono:
+  --font-sans: 'GeistSans', system-ui, sans-serif;
+  --font-mono: 'GeistMono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 }
 
 body {
@@ -30,12 +30,10 @@ body {
 
 .PWA-Title-Draggable {
   -webkit-app-region: drag;
-  /* app-region: drag; */
 }
 
 .PWA-Title-NonDraggable {
   -webkit-app-region: no-drag;
-  /* app-region: no-drag; */
 }
 
 .enginePage {
@@ -44,6 +42,9 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  position: relative;
+  width: 100dvw;
+  height: 100dvh;
 }
 
 .emsplash {
@@ -55,6 +56,15 @@ body {
   animation: spin 1s linear infinite;
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* The canvas *must not* have any border or padding, or mouse coords will be wrong */
 .engineCanvas {
   background-color: black;
@@ -63,6 +73,160 @@ body {
   height: 100dvh;
   object-fit: contain;
   image-rendering: pixelated;
+}
+
+/* ================================
+   ENGINE CONSOLE STYLES
+   ================================ */
+
+.engine-console {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  min-height: 200px;
+  max-height: 60%;
+  background-color: rgba(0, 0, 0, 0.92);
+  border-top: 2px solid #2a2a2a;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono), monospace;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.engine-console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background-color: rgba(20, 20, 20, 0.98);
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.engine-console-title {
+  color: #0f0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.engine-console-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.engine-console-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #888;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  transition: all 0.1s ease;
+}
+
+.engine-console-btn:hover {
+  background-color: #333;
+  border-color: #555;
+  color: #ccc;
+}
+
+.engine-console-btn:active {
+  background-color: #222;
+}
+
+.engine-console-output {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 12px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #d4d4d4;
+}
+
+.engine-console-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 1px 0;
+}
+
+.engine-console-line-number {
+  color: #444;
+  margin-right: 10px;
+  user-select: none;
+  min-width: 36px;
+  display: inline-block;
+  text-align: right;
+}
+
+/* Console line color coding */
+.engine-console-line--info {
+  color: #61afef;
+}
+
+.engine-console-line--success {
+  color: #98c379;
+}
+
+.engine-console-line--warning {
+  color: #e5c07b;
+}
+
+.engine-console-line--error {
+  color: #e06c75;
+}
+
+.engine-console-line--highlight {
+  color: #c678dd;
+}
+
+.engine-console-line--status {
+  color: #56b6c2;
+}
+
+/* Scrollbar styling for console */
+.engine-console-output::-webkit-scrollbar {
+  width: 8px;
+}
+
+.engine-console-output::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.engine-console-output::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.engine-console-output::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Console resize handle (optional) */
+.engine-console-resize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  cursor: ns-resize;
+  background: transparent;
+}
+
+.engine-console-resize:hover {
+  background: rgba(97, 175, 239, 0.3);
 }
 
 @layer utilities {
