@@ -4,35 +4,37 @@ var Module = {
             function () {
                 console.log('EngineFS initialized');
                 const splash = document.getElementById("splash");
-                splash.style.opacity = 0;
-                setTimeout(() => { splash.remove(); }, 1000);
+                if (splash) {
+                    splash.style.opacity = 0;
+                    setTimeout(() => { splash.remove(); }, 1000);
+                }
                 RSDK_Init();
             });
     },
     print: (function () {
         var element = document.getElementById('output');
-        if (element) element.value = ''; // clear browser cache
+        if (element) element.value = '';
         return function (text) {
             if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
 
             console.log(text);
             if (element) {
                 element.value += text + "\n";
-                element.scrollTop = element.scrollHeight; // focus on bottom
+                element.scrollTop = element.scrollHeight;
             }
         };
     })(),
     canvas: (() => {
-        var canvas = document.getElementById('canvas');
-        canvas.addEventListener("webglcontextlost", (e) => { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
-        return canvas;
+        // Don't grab canvas here — it may not exist yet.
+        // Emscripten will find it by ID at runtime.
+        return null;
     })(),
     setStatus: (text) => {
         if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
         if (text === Module.setStatus.last.text) return;
         var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
         var now = Date.now();
-        if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+        if (m && now - Module.setStatus.last.time < 30) return;
         Module.setStatus.last.time = now;
         Module.setStatus.last.text = text;
 
@@ -41,13 +43,11 @@ var Module = {
         }
 
         console.log(text);
-
-        // statusElement.innerHTML = text;
     },
     totalDependencies: 0,
-    monitorRunDependencies: (left) => {
-        this.totalDependencies = Math.max(this.totalDependencies, left);
-        Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+    monitorRunDependencies: function (left) {
+        Module.totalDependencies = Math.max(Module.totalDependencies, left);
+        Module.setStatus(left ? 'Preparing... (' + (Module.totalDependencies - left) + '/' + Module.totalDependencies + ')' : 'All downloads complete.');
     }
 };
 Module.setStatus('Downloading...');
@@ -65,9 +65,6 @@ function RSDK_Init() {
     const storedSettings = localStorage.getItem('settings');
     if (storedSettings) {
         const settings = JSON.parse(storedSettings);
-
-        // value, index
-        // index 0 - plus
         _RSDK_Configure(settings.enablePlus, 0);
     }
 
