@@ -70,12 +70,26 @@ window.onerror = (msg, src, line, col, err) => {
 function RSDK_Init() {
     FS.chdir('/RSDKv5U');
     window.__engineConsoleAppend?.('[STATUS] Working directory set to /RSDKv5U');
+
     const storedSettings = localStorage.getItem('settings');
     if (storedSettings) {
         const settings = JSON.parse(storedSettings);
-        // value, index
-        // index 0 - plus
-        _RSDK_Configure(settings.enablePlus, 0);
+        // ccall is safe for Configure since it's not async
+        Module.ccall('RSDK_Configure', null, ['number', 'number'], [settings.enablePlus, 0]);
     }
-    _RSDK_Initialize();
+
+    // RSDK_Initialize must be called async so Asyncify can suspend/resume correctly
+    window.__engineConsoleAppend?.('[STATUS] Calling RSDK_Initialize...');
+    Module.ccall(
+        'RSDK_Initialize', // C function name (no underscore prefix)
+        null,              // return type
+        [],                // arg types
+        [],                // args
+        { async: true }    // tells Asyncify this call may suspend
+    ).then(() => {
+        window.__engineConsoleAppend?.('[STATUS] RSDK_Initialize returned');
+    }).catch((err) => {
+        window.__engineConsoleAppend?.('[FATAL] RSDK_Initialize threw: ' + err);
+        console.error(err);
+    });
 }
