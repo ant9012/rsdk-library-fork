@@ -2,6 +2,7 @@ var Module = {
     onRuntimeInitialized: function () {
         TS_InitFS('RSDKv5U',
             function () {
+                window.__engineConsoleAppend?.('[STATUS] EngineFS initialized');
                 console.log('EngineFS initialized');
                 const splash = document.getElementById("splash");
                 splash.style.opacity = 0;
@@ -11,17 +12,22 @@ var Module = {
     },
     print: (function () {
         var element = document.getElementById('output');
-        if (element) element.value = ''; // clear browser cache
+        if (element) element.value = '';
         return function (text) {
             if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-
             console.log(text);
+            window.__engineConsoleAppend?.(text);
             if (element) {
                 element.value += text + "\n";
-                element.scrollTop = element.scrollHeight; // focus on bottom
+                element.scrollTop = element.scrollHeight;
             }
         };
     })(),
+    printErr: function (text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.error(text);
+        window.__engineConsoleAppend?.('[ERROR] ' + text);
+    },
     canvas: (() => {
         var canvas = document.getElementById('canvas');
         canvas.addEventListener("webglcontextlost", (e) => { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
@@ -32,17 +38,12 @@ var Module = {
         if (text === Module.setStatus.last.text) return;
         var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
         var now = Date.now();
-        if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+        if (m && now - Module.setStatus.last.time < 30) return;
         Module.setStatus.last.time = now;
         Module.setStatus.last.text = text;
-
-        if (m) {
-            text = m[1];
-        }
-
+        if (m) text = m[1];
         console.log(text);
-
-        // statusElement.innerHTML = text;
+        window.__engineConsoleAppend?.('[STATUS] ' + text);
     },
     totalDependencies: 0,
     monitorRunDependencies: (left) => {
@@ -50,26 +51,31 @@ var Module = {
         Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
     }
 };
-Module.setStatus('Downloading...');
-window.onerror = () => {
-    Module.setStatus('Exception thrown, see JavaScript console');
 
+Module.setStatus('Downloading...');
+
+window.onerror = (msg, src, line, col, err) => {
+    const text = `[FATAL] ${msg} (${src}:${line}:${col})`;
+    console.error(text);
+    window.__engineConsoleAppend?.(text);
+    Module.setStatus('Exception thrown, see JavaScript console');
     Module.setStatus = (text) => {
-        if (text) console.error('[post-exception status] ' + text);
+        if (text) {
+            console.error('[post-exception status] ' + text);
+            window.__engineConsoleAppend?.('[ERROR] ' + text);
+        }
     };
 };
 
 function RSDK_Init() {
     FS.chdir('/RSDKv5U');
-
+    window.__engineConsoleAppend?.('[STATUS] Working directory set to /RSDKv5U');
     const storedSettings = localStorage.getItem('settings');
     if (storedSettings) {
         const settings = JSON.parse(storedSettings);
-
         // value, index
         // index 0 - plus
         _RSDK_Configure(settings.enablePlus, 0);
     }
-
     _RSDK_Initialize();
 }
