@@ -14992,8 +14992,6 @@ var _glPushMatrix = _emscripten_glPushMatrix;
 
 var _glScalef = _emscripten_glScalef;
 
-var _glTexCoord2f = _emscripten_glTexCoord2f;
-
 var _glTexCoordPointer = _emscripten_glTexCoordPointer;
 
 var _glTexImage2D = _emscripten_glTexImage2D;
@@ -16370,7 +16368,6 @@ function assignWasmImports() {
     /** @export */ glPopMatrix: _glPopMatrix,
     /** @export */ glPushMatrix: _glPushMatrix,
     /** @export */ glScalef: _glScalef,
-    /** @export */ glTexCoord2f: _glTexCoord2f,
     /** @export */ glTexCoordPointer: _glTexCoordPointer,
     /** @export */ glTexImage2D: _glTexImage2D,
     /** @export */ glTexParameterf: _glTexParameterf,
