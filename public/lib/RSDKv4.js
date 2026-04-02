@@ -2,6 +2,7 @@ var Module = {
     onRuntimeInitialized: function () {
         TS_InitFS('RSDKv4',
             function () {
+                window.__engineConsoleAppend?.('[STATUS] EngineFS initialized');
                 console.log('EngineFS initialized');
                 const splash = document.getElementById("splash");
                 splash.style.opacity = 0;
@@ -16,12 +17,18 @@ var Module = {
             if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
 
             console.log(text);
+            window.__engineConsoleAppend?.(text);
             if (element) {
                 element.value += text + "\n";
                 element.scrollTop = element.scrollHeight; // focus on bottom
             }
         };
     })(),
+    printErr: function (text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.error(text);
+        window.__engineConsoleAppend?.('[ERROR] ' + text);
+    },
     canvas: (() => {
         var canvas = document.getElementById('canvas');
         canvas.addEventListener("webglcontextlost", (e) => { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
@@ -41,6 +48,7 @@ var Module = {
         }
 
         console.log(text);
+        window.__engineConsoleAppend?.('[STATUS] ' + text);
 
         // statusElement.innerHTML = text;
     },
@@ -51,21 +59,27 @@ var Module = {
     }
 };
 Module.setStatus('Downloading...');
+
 window.onerror = (event, source, lineno, colno, error) => {
     var msg = "Error: " + event;
     if (error && error.stack) msg += "\n" + error.stack;
     
     // Send to console.error so our React Hook catches it!
     console.error(msg); 
+    window.__engineConsoleAppend?.(`[FATAL] ${msg}`);
     
     Module.setStatus('Exception thrown: ' + event);
     Module.setStatus = (text) => {
-        if (text) console.error('[post-exception status] ' + text);
+        if (text) {
+            console.error('[post-exception status] ' + text);
+            window.__engineConsoleAppend?.('[ERROR] ' + text);
+        }
     };
 };
 
 function RSDK_Init() {
     FS.chdir('/RSDKv4');
+    window.__engineConsoleAppend?.('[STATUS] Working directory set to /RSDKv4');
 
     const storedSettings = localStorage.getItem('settings');
     if (storedSettings) {
@@ -86,6 +100,7 @@ function RSDK_Init() {
         }        
     }
 
+    window.__engineConsoleAppend?.('[STATUS] Calling RSDK_Initialize...');
     _RSDK_Initialize();
 }
 
@@ -96,6 +111,7 @@ window.addEventListener('mousedown', function() {
         if (SDL2.audioContext.state === 'suspended') {
             SDL2.audioContext.resume().then(() => {
                 console.log("Web AudioContext Resumed");
+                window.__engineConsoleAppend?.('[STATUS] Web AudioContext Resumed');
             });
         }
     }
