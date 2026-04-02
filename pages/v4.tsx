@@ -48,8 +48,8 @@ export default function V4() {
                     <canvas className='engineCanvas' id='canvas' />
                 </ThemeProvider>
                 <Script src='coi-serviceworker.js' />
-                <Script src='./lib/RSDKv5U.js' />
-                <Script src='./modules/RSDKv5U.js' />
+                <Script src='./lib/RSDKv4.js' />
+                <Script src='./modules/RSDKv4.js' />
             </div>
         </>
     )
