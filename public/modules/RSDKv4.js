@@ -14946,6 +14946,8 @@ function _fd_write(fd, iov, iovcnt, pnum) {
   }
 }
 
+var _glBegin = _emscripten_glBegin;
+
 var _glBindFramebuffer = _emscripten_glBindFramebuffer;
 
 var _glBindTexture = _emscripten_glBindTexture;
@@ -14963,6 +14965,8 @@ var _glDeleteFramebuffers = _emscripten_glDeleteFramebuffers;
 var _glDeleteTextures = _emscripten_glDeleteTextures;
 
 var _glDisableClientState = _emscripten_glDisableClientState;
+
+var _glEnd = _emscripten_glEnd;
 
 var _glFramebufferTexture2D = _emscripten_glFramebufferTexture2D;
 
@@ -14987,6 +14991,8 @@ var _glPopMatrix = _emscripten_glPopMatrix;
 var _glPushMatrix = _emscripten_glPushMatrix;
 
 var _glScalef = _emscripten_glScalef;
+
+var _glTexCoord2f = _emscripten_glTexCoord2f;
 
 var _glTexCoordPointer = _emscripten_glTexCoordPointer;
 
@@ -15501,14 +15507,14 @@ Module["IDBFS"] = IDBFS;
 var proxiedFunctionTable = [ _proc_exit, exitOnMainThread, pthreadCreateProxied, ___syscall_fcntl64, ___syscall_fstat64, ___syscall_getcwd, ___syscall_getdents64, ___syscall_ioctl, ___syscall_lstat64, ___syscall_newfstatat, ___syscall_openat, ___syscall_stat64, __setitimer_js, _eglBindAPI, _eglChooseConfig, _eglCreateContext, _eglCreateWindowSurface, _eglDestroyContext, _eglDestroySurface, _eglGetConfigAttrib, _eglGetDisplay, _eglGetError, _eglInitialize, _eglMakeCurrent, _eglQueryString, _eglSwapBuffers, _eglSwapInterval, _eglTerminate, _eglWaitClient, _eglWaitNative, _emscripten_exit_fullscreen, getCanvasSizeMainThread, setCanvasElementSizeMainThread, _emscripten_exit_pointerlock, _emscripten_get_device_pixel_ratio, _emscripten_get_element_css_size, _emscripten_get_gamepad_status, _emscripten_get_num_gamepads, _emscripten_get_screen_size, _emscripten_request_fullscreen_strategy, _emscripten_request_pointerlock, _emscripten_sample_gamepad_data, _emscripten_set_beforeunload_callback_on_thread, _emscripten_set_blur_callback_on_thread, _emscripten_set_element_css_size, _emscripten_set_focus_callback_on_thread, _emscripten_set_fullscreenchange_callback_on_thread, _emscripten_set_gamepadconnected_callback_on_thread, _emscripten_set_gamepaddisconnected_callback_on_thread, _emscripten_set_keydown_callback_on_thread, _emscripten_set_keypress_callback_on_thread, _emscripten_set_keyup_callback_on_thread, _emscripten_set_mousedown_callback_on_thread, _emscripten_set_mouseenter_callback_on_thread, _emscripten_set_mouseleave_callback_on_thread, _emscripten_set_mousemove_callback_on_thread, _emscripten_set_mouseup_callback_on_thread, _emscripten_set_pointerlockchange_callback_on_thread, _emscripten_set_resize_callback_on_thread, _emscripten_set_touchcancel_callback_on_thread, _emscripten_set_touchend_callback_on_thread, _emscripten_set_touchmove_callback_on_thread, _emscripten_set_touchstart_callback_on_thread, _emscripten_set_visibilitychange_callback_on_thread, _emscripten_set_wheel_callback_on_thread, _emscripten_set_window_title, _environ_get, _environ_sizes_get, _fd_close, _fd_read, _fd_seek, _fd_write ];
 
 var ASM_CONSTS = {
-  712592: () => {
+  712448: () => {
     if (window.SDL2 && SDL2.audioContext && SDL2.audioContext.state === "suspended") {
       SDL2.audioContext.resume().then(function() {
         console.log("AudioContext resumed successfully.");
       });
     }
   },
-  712781: () => {
+  712637: () => {
     if (typeof (AudioContext) !== "undefined") {
       return true;
     } else if (typeof (webkitAudioContext) !== "undefined") {
@@ -15516,7 +15522,7 @@ var ASM_CONSTS = {
     }
     return false;
   },
-  712928: () => {
+  712784: () => {
     if ((typeof (navigator.mediaDevices) !== "undefined") && (typeof (navigator.mediaDevices.getUserMedia) !== "undefined")) {
       return true;
     } else if (typeof (navigator.webkitGetUserMedia) !== "undefined") {
@@ -15524,7 +15530,7 @@ var ASM_CONSTS = {
     }
     return false;
   },
-  713162: $0 => {
+  713018: $0 => {
     if (typeof (Module["SDL2"]) === "undefined") {
       Module["SDL2"] = {};
     }
@@ -15548,11 +15554,11 @@ var ASM_CONSTS = {
     }
     return SDL2.audioContext === undefined ? -1 : 0;
   },
-  713714: () => {
+  713570: () => {
     var SDL2 = Module["SDL2"];
     return SDL2.audioContext.sampleRate;
   },
-  713782: ($0, $1, $2, $3) => {
+  713638: ($0, $1, $2, $3) => {
     var SDL2 = Module["SDL2"];
     var have_microphone = function(stream) {
       if (SDL2.capture.silenceTimer !== undefined) {
@@ -15594,7 +15600,7 @@ var ASM_CONSTS = {
       }, have_microphone, no_microphone);
     }
   },
-  715475: ($0, $1, $2, $3) => {
+  715331: ($0, $1, $2, $3) => {
     var SDL2 = Module["SDL2"];
     SDL2.audio.scriptProcessorNode = SDL2.audioContext["createScriptProcessor"]($1, 0, $0);
     SDL2.audio.scriptProcessorNode["onaudioprocess"] = function(e) {
@@ -15626,7 +15632,7 @@ var ASM_CONSTS = {
       SDL2.audio.silenceTimer = setInterval(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1e3);
     }
   },
-  716650: ($0, $1) => {
+  716506: ($0, $1) => {
     var SDL2 = Module["SDL2"];
     var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels;
     for (var c = 0; c < numChannels; ++c) {
@@ -15645,7 +15651,7 @@ var ASM_CONSTS = {
       }
     }
   },
-  717255: ($0, $1) => {
+  717111: ($0, $1) => {
     var SDL2 = Module["SDL2"];
     var buf = $0 >>> 2;
     var numChannels = SDL2.audio.currentOutputBuffer["numberOfChannels"];
@@ -15659,7 +15665,7 @@ var ASM_CONSTS = {
       }
     }
   },
-  717744: $0 => {
+  717600: $0 => {
     var SDL2 = Module["SDL2"];
     if ($0) {
       if (SDL2.capture.silenceTimer !== undefined) {
@@ -15693,12 +15699,12 @@ var ASM_CONSTS = {
       SDL2.audioContext = undefined;
     }
   },
-  718750: $0 => {
+  718606: $0 => {
     window.open(UTF8ToString($0), "_blank");
   },
-  718790: () => window.innerWidth,
-  718820: () => window.innerHeight,
-  718851: ($0, $1, $2) => {
+  718646: () => window.innerWidth,
+  718676: () => window.innerHeight,
+  718707: ($0, $1, $2) => {
     var w = $0;
     var h = $1;
     var pixels = $2;
@@ -15769,7 +15775,7 @@ var ASM_CONSTS = {
     }
     SDL2.ctx.putImageData(SDL2.image, 0, 0);
   },
-  720317: ($0, $1, $2, $3, $4) => {
+  720173: ($0, $1, $2, $3, $4) => {
     var w = $0;
     var h = $1;
     var hot_x = $2;
@@ -15806,12 +15812,12 @@ var ASM_CONSTS = {
     stringToUTF8(url, urlBuf, url.length + 1);
     return urlBuf;
   },
-  721305: $0 => {
+  721161: $0 => {
     if (Module["canvas"]) {
       Module["canvas"].style["cursor"] = UTF8ToString($0);
     }
   },
-  721388: () => {
+  721244: () => {
     if (Module["canvas"]) {
       Module["canvas"].style["cursor"] = "none";
     }
@@ -16335,11 +16341,13 @@ function assignWasmImports() {
     /** @export */ fd_read: _fd_read,
     /** @export */ fd_seek: _fd_seek,
     /** @export */ fd_write: _fd_write,
+    /** @export */ glBegin: _glBegin,
     /** @export */ glBindFramebuffer: _glBindFramebuffer,
     /** @export */ glBindTexture: _glBindTexture,
     /** @export */ glBlendFunc: _glBlendFunc,
     /** @export */ glClear: _glClear,
     /** @export */ glClearColor: _glClearColor,
+    /** @export */ glColor4f: _glColor4f,
     /** @export */ glColorPointer: _glColorPointer,
     /** @export */ glDeleteFramebuffers: _glDeleteFramebuffers,
     /** @export */ glDeleteTextures: _glDeleteTextures,
@@ -16348,6 +16356,7 @@ function assignWasmImports() {
     /** @export */ glDrawElements: _glDrawElements,
     /** @export */ glEnable: _glEnable,
     /** @export */ glEnableClientState: _glEnableClientState,
+    /** @export */ glEnd: _glEnd,
     /** @export */ glFramebufferTexture2D: _glFramebufferTexture2D,
     /** @export */ glGenFramebuffers: _glGenFramebuffers,
     /** @export */ glGenTextures: _glGenTextures,
@@ -16361,10 +16370,12 @@ function assignWasmImports() {
     /** @export */ glPopMatrix: _glPopMatrix,
     /** @export */ glPushMatrix: _glPushMatrix,
     /** @export */ glScalef: _glScalef,
+    /** @export */ glTexCoord2f: _glTexCoord2f,
     /** @export */ glTexCoordPointer: _glTexCoordPointer,
     /** @export */ glTexImage2D: _glTexImage2D,
     /** @export */ glTexParameterf: _glTexParameterf,
     /** @export */ glTexSubImage2D: _glTexSubImage2D,
+    /** @export */ glVertex2f: _glVertex2f,
     /** @export */ glVertexPointer: _glVertexPointer,
     /** @export */ glViewport: _glViewport,
     /** @export */ memory: wasmMemory,
