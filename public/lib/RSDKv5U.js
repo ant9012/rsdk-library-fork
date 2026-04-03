@@ -74,22 +74,13 @@ function RSDK_Init() {
     const storedSettings = localStorage.getItem('settings');
     if (storedSettings) {
         const settings = JSON.parse(storedSettings);
-        // ccall is safe for Configure since it's not async
         Module.ccall('RSDK_Configure', null, ['number', 'number'], [settings.enablePlus, 0]);
     }
 
-    // RSDK_Initialize must be called async so Asyncify can suspend/resume correctly
     window.__engineConsoleAppend?.('[STATUS] Calling RSDK_Initialize...');
-    Module.ccall(
-        'RSDK_Initialize', // C function name (no underscore prefix)
-        null,              // return type
-        [],                // arg types
-        [],                // args
-        { async: true }    // tells Asyncify this call may suspend
-    ).then(() => {
-        window.__engineConsoleAppend?.('[STATUS] RSDK_Initialize returned');
-    }).catch((err) => {
-        window.__engineConsoleAppend?.('[FATAL] RSDK_Initialize threw: ' + err);
-        console.error(err);
-    });
+
+   
+    Module.ccall('RSDK_Initialize', null, [], []);
+
+    window.__engineConsoleAppend?.('[STATUS] RSDK_Initialize dispatched (loop runs via emscripten_set_main_loop)');
 }
