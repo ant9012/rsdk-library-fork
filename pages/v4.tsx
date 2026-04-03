@@ -26,131 +26,26 @@ import EngineFS from '@/lib/EngineFS'
 // ---------------------
 
 export default function V4() {
-    const [consoleVisible, setConsoleVisible] = React.useState(false);
-    const [consoleLines, setConsoleLines] = React.useState<string[]>([]);
-    const consoleEndRef = React.useRef<HTMLDivElement>(null);
-
+    // this is stupid.
     React.useEffect(() => {
-        // Flush anything that was buffered before the component mounted,
-        // then replace the buffer-writer with the real React state setter.
-        const buffered: string[] = (window as any).__engineConsoleBuffer ?? [];
-        if (buffered.length > 0) {
-            setConsoleLines(buffered.slice(-500));
-        }
-
-        (window as any).__engineConsoleAppend = (text: string) => {
-            setConsoleLines(prev => {
-                const next = [...prev, text];
-                if (next.length > 500) next.splice(0, next.length - 500);
-                return next;
-            });
-        };
-
-        (window as any).TS_InitFS = async (p: string, f: any) => {
+        window.TS_InitFS = async (p: string, f: any) => {
             try {
                 await EngineFS.Init(p);
                 f();
             } catch (error) {
-                console.error('EngineFS init failed:', error);
             }
         };
     }, []);
-
-    React.useEffect(() => {
-        if (consoleEndRef.current && consoleVisible) {
-            consoleEndRef.current.scrollIntoView({ behavior: 'auto' });
-        }
-    }, [consoleLines, consoleVisible]);
-
-    React.useEffect(() => {
-        const handleKey = (e: KeyboardEvent) => {
-            if (e.key === '`' || e.key === '~') {
-                e.preventDefault();
-                setConsoleVisible(prev => !prev);
-            }
-        };
-        window.addEventListener('keydown', handleKey);
-        return () => window.removeEventListener('keydown', handleKey);
-    }, []);
-
-    const getLineClass = (line: string): string => {
-        if (line.includes('[ERROR]') || line.includes('ERROR') || line.includes('Exception') || line.includes('[FATAL]'))
-            return 'engine-console-line--error';
-        if (line.includes('WARNING') || line.includes('WARN'))
-            return 'engine-console-line--warning';
-        if (line.includes('MSZSetup:'))
-            return 'engine-console-line--info';
-        if (line.includes('->'))
-            return 'engine-console-line--success';
-        if (line.includes('TRANSITIONING'))
-            return 'engine-console-line--highlight';
-        if (line.includes('[STATUS]'))
-            return 'engine-console-line--status';
-        return '';
-    };
 
     return (
         <>
             <Head>
                 <meta name='viewport' content='initial-scale=1, viewport-fit=cover' />
             </Head>
-
-            {/*
-                Runs synchronously before any other scripts.
-                Sets up a buffer so nothing logged during engine boot is lost.
-                Once the useEffect above fires, it flushes the buffer and
-                replaces __engineConsoleAppend with the real React setter.
-            */}
-            <Script id='engine-console-prebuffer' strategy='beforeInteractive'>{`
-                window.__engineConsoleBuffer = [];
-                window.__engineConsoleAppend = function(text) {
-                    window.__engineConsoleBuffer.push(text);
-                    if (window.__engineConsoleBuffer.length > 500)
-                        window.__engineConsoleBuffer.splice(0, window.__engineConsoleBuffer.length - 500);
-                };
-            `}</Script>
-
             <div className='enginePage'>
                 <ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
                     <Splash/>
                     <canvas className='engineCanvas' id='canvas' />
-
-                    {consoleVisible && (
-                        <div className='engine-console'>
-                            <div className='engine-console-resize' />
-                            <div className='engine-console-header'>
-                                <span className='engine-console-title'>Engine Console</span>
-                                <div className='engine-console-buttons'>
-                                    <button
-                                        className='engine-console-btn'
-                                        onClick={() => setConsoleLines([])}
-                                    >
-                                        Clear
-                                    </button>
-                                    <button
-                                        className='engine-console-btn'
-                                        onClick={() => setConsoleVisible(false)}
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-                            </div>
-                            <div className='engine-console-output'>
-                                {consoleLines.map((line, i) => (
-                                    <div
-                                        key={i}
-                                        className={`engine-console-line ${getLineClass(line)}`}
-                                    >
-                                        <span className='engine-console-line-number'>
-                                            {String(i).padStart(4, '0')}
-                                        </span>
-                                        {line}
-                                    </div>
-                                ))}
-                                <div ref={consoleEndRef} />
-                            </div>
-                        </div>
-                    )}
                 </ThemeProvider>
                 <Script src='coi-serviceworker.js' />
                 <Script src='./lib/RSDKv4.js' />
