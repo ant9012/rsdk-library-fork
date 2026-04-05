@@ -44,7 +44,7 @@ export default function V3() {
 
     React.useEffect(() => {
         // ---- Favicon ----
-        loadFavicon('./icons/CD.ico');
+        loadFavicon('./icons/scd.ico');
 
         // ---- Engine FS init ----
         window.TS_InitFS = async (p: string, f: any) => {
