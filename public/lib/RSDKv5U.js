@@ -11,9 +11,16 @@ var Module = {
     onRuntimeInitialized: function () {
         console.log('Runtime initialized, waiting for FS...');
         
+        // Check if TS_InitFS is available
+        if (typeof window.TS_InitFS !== 'function') {
+            console.error('TS_InitFS is not defined! Check script loading order.');
+            window.__engineConsoleAppend?.('[ERROR] TS_InitFS not available');
+            return;
+        }
+        
         // Delay FS init to give IDBFS time to mount properly
         setTimeout(() => {
-            TS_InitFS('RSDKv5U', function () {
+            window.TS_InitFS('RSDKv5U', function () {
                 window.__engineConsoleAppend?.('[STATUS] EngineFS initialized');
                 console.log('EngineFS initialized');
                 const splash = document.getElementById("splash");
@@ -148,24 +155,6 @@ window.onerror = (msg, src, line, col, err) => {
             window.__engineConsoleAppend?.('[ERROR] ' + text);
         }
     };
-};
-
-// ===== ASYNC FILESYSTEM INITIALIZATION =====
-window.TS_InitFS = async (p, f) => {
-    try {
-        console.log('[FS] Starting async initialization for:', p);
-        await EngineFS.Init(p);
-        console.log('[FS] EngineFS.Init completed');
-        
-        // Give the filesystem a moment to settle
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        console.log('[FS] Calling callback');
-        f();
-    } catch (error) {
-        console.error('[FS] EngineFS init failed:', error);
-        window.__engineConsoleAppend?.('[ERROR] FS init failed: ' + error.message);
-    }
 };
 
 // ===== ENGINE INITIALIZATION =====
