@@ -20,6 +20,10 @@ export default function V5U() {
     const consoleEndRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
+        // ===== EXPOSE EngineFS GLOBALLY FIRST =====
+        (window as any).EngineFS = EngineFS;
+        console.log('[v5U] EngineFS exposed globally');
+
         // Wait for service worker to be ready before loading engine
         const checkServiceWorker = async () => {
             if ('serviceWorker' in navigator) {
@@ -29,18 +33,15 @@ export default function V5U() {
                     setEngineReady(true);
                 } catch (e) {
                     console.error('Service worker failed:', e);
-                    // Fallback: still try to load
                     setEngineReady(true);
                 }
             } else {
-                // No service worker support, load anyway
                 setEngineReady(true);
             }
         };
         checkServiceWorker();
 
-        // Flush anything that was buffered before the component mounted,
-        // then replace the buffer-writer with the real React state setter.
+        // Flush buffered console messages
         const buffered: string[] = (window as any).__engineConsoleBuffer ?? [];
         if (buffered.length > 0) {
             setConsoleLines(buffered.slice(-500));
@@ -52,24 +53,6 @@ export default function V5U() {
                 if (next.length > 500) next.splice(0, next.length - 500);
                 return next;
             });
-        };
-
-        // ===== EXPOSE EngineFS TO GLOBAL SCOPE =====
-        window.TS_InitFS = async (p: string, f: any) => {
-            try {
-                console.log('[TS_InitFS] Starting initialization for:', p);
-                await EngineFS.Init(p);
-                console.log('[TS_InitFS] EngineFS.Init completed');
-                
-                // Give the filesystem a moment to settle
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                console.log('[TS_InitFS] Calling callback');
-                f();
-            } catch (error) {
-                console.error('[TS_InitFS] EngineFS init failed:', error);
-                window.__engineConsoleAppend?.('[ERROR] FS init failed: ' + (error as Error).message);
-            }
         };
     }, []);
 
@@ -129,6 +112,31 @@ export default function V5U() {
                     window.__engineConsoleBuffer.push(text);
                     if (window.__engineConsoleBuffer.length > 500)
                         window.__engineConsoleBuffer.splice(0, window.__engineConsoleBuffer.length - 500);
+                };
+            `}</Script>
+
+            {/* EngineFS initialization function */}
+            <Script id='engine-fs-init' strategy='beforeInteractive'>{`
+                window.TS_InitFS = async function(p, f) {
+                    try {
+                        console.log('[TS_InitFS] Starting initialization for:', p);
+                        
+                        if (typeof window.EngineFS === 'undefined') {
+                            throw new Error('EngineFS not loaded yet');
+                        }
+                        
+                        await window.EngineFS.Init(p);
+                        console.log('[TS_InitFS] EngineFS.Init completed');
+                        
+                        // Give the filesystem a moment to settle
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                        console.log('[TS_InitFS] Calling callback');
+                        f();
+                    } catch (error) {
+                        console.error('[TS_InitFS] EngineFS init failed:', error);
+                        window.__engineConsoleAppend?.('[ERROR] FS init failed: ' + error.message);
+                    }
                 };
             `}</Script>
 
