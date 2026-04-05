@@ -5,7 +5,6 @@ import * as React from 'react'
 import '@/app/globals.css'
 import '@/app/engine.css'
 
-import Head from 'next/head'
 import Script from 'next/script'
 
 import { ThemeProvider } from '@/app/controls/theme-provider'
@@ -18,10 +17,12 @@ export default function V5U() {
     const [consoleVisible, setConsoleVisible] = React.useState(false);
     const [consoleLines, setConsoleLines] = React.useState<string[]>([]);
     const [engineReady, setEngineReady] = React.useState(false);
-    const [pageTitle, setPageTitle] = React.useState('RSDKv5U');
     const consoleEndRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
+        // ===== SET INITIAL TITLE =====
+        document.title = 'RSDKv5U';
+        
         // ===== EXPOSE EngineFS GLOBALLY FIRST =====
         (window as any).EngineFS = EngineFS;
         console.log('[v5U] EngineFS exposed globally');
@@ -29,29 +30,6 @@ export default function V5U() {
         // ===== INITIALIZE FAVICON LOADER =====
         FaviconLoader.init();
         console.log('[v5U] FaviconLoader initialized');
-
-        // ===== WATCH FOR TITLE CHANGES =====
-        const titleObserver = new MutationObserver(() => {
-            const newTitle = document.title;
-            if (newTitle && newTitle !== pageTitle) {
-                setPageTitle(newTitle);
-                console.log('[v5U] Title changed to:', newTitle);
-            }
-        });
-
-        const titleElement = document.querySelector('title');
-        if (titleElement) {
-            titleObserver.observe(titleElement, {
-                childList: true,
-                characterData: true,
-                subtree: true
-            });
-        }
-
-        // Also set initial title
-        if (document.title && document.title !== pageTitle) {
-            setPageTitle(document.title);
-        }
 
         // Wait for service worker to be ready before loading engine
         const checkServiceWorker = async () => {
@@ -87,7 +65,6 @@ export default function V5U() {
         // Cleanup on unmount
         return () => {
             FaviconLoader.destroy();
-            titleObserver.disconnect();
         };
     }, []);
 
@@ -130,11 +107,6 @@ export default function V5U() {
 
     return (
         <>
-            <Head>
-                <title>{pageTitle}</title>
-                <meta name='viewport' content='initial-scale=1, viewport-fit=cover' />
-            </Head>
-
             {/* Load service worker FIRST and wait for it */}
             <Script 
                 src='coi-serviceworker.js' 
