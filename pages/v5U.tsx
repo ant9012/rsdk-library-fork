@@ -12,6 +12,7 @@ import { ThemeProvider } from '@/app/controls/theme-provider'
 import { Splash } from '@/app/controls/splash'
 
 import EngineFS from '@/lib/EngineFS'
+import FaviconLoader from '@/lib/FaviconLoader'
 
 export default function V5U() {
     const [consoleVisible, setConsoleVisible] = React.useState(false);
@@ -23,6 +24,10 @@ export default function V5U() {
         // ===== EXPOSE EngineFS GLOBALLY FIRST =====
         (window as any).EngineFS = EngineFS;
         console.log('[v5U] EngineFS exposed globally');
+
+        // ===== INITIALIZE FAVICON LOADER =====
+        FaviconLoader.init();
+        console.log('[v5U] FaviconLoader initialized');
 
         // Wait for service worker to be ready before loading engine
         const checkServiceWorker = async () => {
@@ -53,6 +58,11 @@ export default function V5U() {
                 if (next.length > 500) next.splice(0, next.length - 500);
                 return next;
             });
+        };
+
+        // Cleanup on unmount
+        return () => {
+            FaviconLoader.destroy();
         };
     }, []);
 
